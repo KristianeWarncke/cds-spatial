@@ -141,9 +141,26 @@ tm_shape(elevation)  +
 ## Your solution
 
 ```{r improved-map}
-# /Start Code/
-
-# /End Code/
+# starting a static map in tmap v4
+tm_shape(elevation) +
+  tm_raster(#col.legend = tm_legend(title ="Meters Above Sea Level"),
+            palette = "-RdYlGn",
+            title = "Meters Above Sea Level",
+            col.scale = tm_scale_continuous(values = "brewer.bu_gn",
+                                            midpoint = 0)) +
+  tm_shape(counties) + 
+  tm_borders(col = "black", 
+             lwd = 1) +
+  tm_scalebar(breaks = c(0, 50, 100, 150, 200),
+               text.size = 1,
+              position = 'TOP', 'right') +
+  tm_compass(position = c("TOP", "right"),
+             type = "rose", 
+             size = 2) +
+  tm_credits(text = "K. Warncke, 27/2/2025") +
+  tm_title("Denmark's municipalities") +
+  tm_layout(bg.color = "lightblue",
+            inner.margins = c(0, 0, 0, 0))
 ```
 
 
@@ -164,12 +181,15 @@ Load the two datasets:
 # Load your DK places googlesheet from W01
 gs4_deauth() # if the Gdrive authentication is not working for you
 
-places <- read_sheet("https://docs.google.com/spreadsheets/d/1PlxsPElZML8LZKyXbqdAYeQCDIvDps2McZx1cTVWSzI/edit#gid=1817942479",_______)
+places <- read_sheet("https://docs.google.com/spreadsheets/d/1PlxsPElZML8LZKyXbqdAYeQCDIvDps2McZx1cTVWSzI/edit#gid=1817942479", range = "SA2025")
+
+glimpse(places)
 
 
 # Load the first 5000 rows in .csv-file and save it as "nitrates":
 nitrates <- read_csv("../data/nitrate.csv") %>% 
   slice(1:5000)
+glimpse(nitrates)
 ```
 
 
@@ -184,8 +204,8 @@ Tabular data contain spatial data, that you can use to convert these tibbles int
 ```{r st-as-sf, eval = FALSE}
 
 places_sf <- places %>% 
-  filter(!is.na(_________)) %>% 
-  st_as_sf(coords = ____(__________,________))
+  filter(!is.na(Longitude)) %>% 
+  st_as_sf(coords = c("Longitude","Latitude"), crs = 4326)
 
 nitrates_sf <- _______(nitrates, wkt = __________)
 
